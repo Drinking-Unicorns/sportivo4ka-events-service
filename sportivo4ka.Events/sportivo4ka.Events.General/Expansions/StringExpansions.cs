@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace sportivo4ka.Events.General.Expansions
 {
@@ -47,5 +49,10 @@ namespace sportivo4ka.Events.General.Expansions
             elements.All(x => x.CanParseToFloat());
 
         public static string[] ToArray(this string elements) => elements.Split(',');
+
+        public static T ToObject<T>(this string json) => JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        public async static Task<T> ToObject<T>(this Task<string> json) => JsonSerializer.Deserialize<T>(await json);
+
     }
 }

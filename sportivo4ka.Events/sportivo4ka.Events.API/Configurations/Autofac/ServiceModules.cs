@@ -30,6 +30,12 @@ namespace sportivo4ka.Events.API.Configurations.Autofac
             builder.RegisterType<BI.Services.Dadata>()
                 .As<IDadata>();
 
+            builder.RegisterType<DataSend>()
+                .As<IDataSend>();
+
+            builder.RegisterType<Users>()
+                .As<IUsers>();
+
             builder.RegisterType<CreateEventToDto>();
 
             builder.Register(context => new MapperConfiguration(cfg =>

@@ -13,12 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\sportivo4ka.Events.Data\sportivo4ka.Events.Data.csproj" />
-    <ProjectReference Include="..\Sportivo4ka.Events.General\Sportivo4ka.Events.General.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\Sportivo4ka.Events.General\Sportivo4ka.Events.General.csproj" />
   </ItemGroup>
 
 </Project>

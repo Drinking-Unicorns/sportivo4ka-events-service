@@ -17,11 +17,13 @@ namespace sportivo4ka.Events.BI.Services
     {
         private readonly ServiceDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IUsers _users;
 
-        public Checker(ServiceDbContext context, IMapper mapper)
+        public Checker(ServiceDbContext context, IMapper mapper, IUsers users)
         {
             _context = context;
             _mapper = mapper;
+            _users = users;
         }
 
         public async Task<AddUserReturn> EditCodeUserToEvent(EditCodeUserToEventDto newCode)
@@ -58,15 +60,17 @@ namespace sportivo4ka.Events.BI.Services
             var q = await _context.UsersActivity.SingleOrDefaultAsync(x => x.UserId == user.UserId && x.EventId == user.EventId);
 
             if (q is not null)
-                return AddUserReturnError("Пользователь уже записан на данное мероприятие!");
+                _context.Remove(q);
+            else
+            {
+                var entity = _mapper.Map<Event2UserEntity>(user);
 
-            var entity = _mapper.Map<Event2UserEntity>(user);
+                entity.Event = e;
 
-            entity.Event = e;
+                entity = GenerateCodes(entity);
 
-            entity = GenerateCodes(entity);
-
-            await _context.AddAsync(entity);
+                await _context.AddAsync(entity);
+            }
             await _context.SaveChangesAsync();
 
             return AddUserReturnOk();
@@ -87,6 +91,14 @@ namespace sportivo4ka.Events.BI.Services
                 x.CodeEnd = null;
             else
                 x.CodeStart = null;
+
+            if (x.Event.WinningPoints > 0 && String.IsNullOrEmpty(x.CodeStart) && String.IsNullOrEmpty(x.CodeEnd))
+                await _users.SendPoints(new SendPointDto
+                {
+                    UserId = checker.UserId,
+                    EventId = x.EventId,
+                    CountPoints = (float)x.Event.WinningPoints
+                });
 
             _context.Update(x);
             await _context.SaveChangesAsync();
